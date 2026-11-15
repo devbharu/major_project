@@ -1,0 +1,82 @@
+[
+ {
+  "name": "pytest assertion",
+  "log": "E   AssertionError: assert 11 == 10\nFAILED tests/test_total.py::test_total - AssertionError\n##[error]Process completed with exit code 1.",
+  "category": "test_failure"
+ },
+ {
+  "name": "jest failure",
+  "log": "FAIL src/cart.test.ts\n  \u25cf total \u203a adds tax\n    expect(received).toBe(expected)\nTests: 1 failed, 4 passed",
+  "category": "test_failure"
+ },
+ {
+  "name": "missing python module",
+  "log": "ImportError while importing test module\nModuleNotFoundError: No module named 'yaml'",
+  "category": "dependency"
+ },
+ {
+  "name": "npm resolution",
+  "log": "npm ERR! code ERESOLVE\nnpm ERR! Could not resolve dependency: peer react@\"^17\"",
+  "category": "dependency"
+ },
+ {
+  "name": "ruff lint",
+  "log": "ruff check .\napp/cart.py:3:8: F401 [*] `os` imported but unused\nFound 1 error.",
+  "category": "lint"
+ },
+ {
+  "name": "eslint",
+  "log": "/src/App.jsx\n  12:7  error  'x' is assigned a value but never used  no-unused-vars\n\u2716 1 problem (1 error, 0 warnings)",
+  "category": "lint"
+ },
+ {
+  "name": "typescript",
+  "log": "src/api.ts(14,5): error TS2322: Type 'string' is not assignable to type 'number'.",
+  "category": "type_error"
+ },
+ {
+  "name": "python syntax",
+  "log": "  File \"app/main.py\", line 4\n    def f(:\nSyntaxError: invalid syntax",
+  "category": "syntax"
+ },
+ {
+  "name": "docker build",
+  "log": "ERROR: failed to solve: process \"/bin/sh -c npm run build\" did not complete successfully",
+  "category": "build"
+ },
+ {
+  "name": "network flake",
+  "log": "npm ERR! network request failed\nError: read ECONNRESET",
+  "category": "flaky_infra"
+ },
+ {
+  "name": "runner shutdown",
+  "log": "##[error]The runner has received a shutdown signal.",
+  "category": "flaky_infra"
+ },
+ {
+  "name": "deploy permissions",
+  "log": "##[error]Resource not accessible by integration\nHttpError: 403",
+  "category": "permissions_config"
+ },
+ {
+  "name": "missing secret",
+  "log": "Error: Input required and not supplied: token",
+  "category": "permissions_config"
+ },
+ {
+  "name": "missing working directory",
+  "log": "##[error]An error occurred trying to start process '/usr/bin/bash' with working directory '/home/runner/work/app/app/backend-service'. No such file or directory",
+  "category": "workflow_config"
+ },
+ {
+  "name": "unresolvable action",
+  "log": "##[error]Unable to resolve action `actions/checkout@v9`, unable to find version `v9`",
+  "category": "workflow_config"
+ },
+ {
+  "name": "invalid workflow",
+  "log": "Invalid workflow file: .github/workflows/ci.yml#L12\nThe workflow is not valid. Unexpected value 'runs-on'",
+  "category": "workflow_config"
+ }
+]
