@@ -22,6 +22,7 @@ env/
 ENV/
 env.bak/
 venv.bak/
+.DS_Store
 
 # Python Distribution / Packaging
 build/
