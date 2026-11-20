@@ -12,4 +12,4 @@ ENV WARREN_ENV=production SQLITE_PATH=/data/warren.db CHROMA_PATH=/data/chroma C
 EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:5000/healthz', timeout=4)"
 # One worker on purpose; concurrency comes from threads (SSE streams + background jobs).
-CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:5000", "--worker-class", "gthread", "--workers", "1", "--threads", "32", "--timeout", "120", "--graceful-timeout", "30"]
+CMD ["sh", "-c", "gunicorn wsgi:app --bind 0.0.0.0:${PORT:-5000} --worker-class gthread --workers 1 --threads 32 --timeout 120 --graceful-timeout 30"]

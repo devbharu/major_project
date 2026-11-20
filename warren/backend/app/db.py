@@ -81,6 +81,10 @@ class Database:
         self._conn.row_factory = sqlite3.Row
         self._lock = threading.RLock()
         with self._lock:
+            if path != ":memory:":
+                self._conn.execute("PRAGMA journal_mode = WAL")
+                self._conn.execute("PRAGMA synchronous = NORMAL")
+                self._conn.execute("PRAGMA busy_timeout = 5000")
             self._conn.executescript(SCHEMA)
             cols = {r["name"] for r in self._conn.execute("PRAGMA table_info(events)")}
             if "incident_id" not in cols:   # migrate databases created before incidents existed
