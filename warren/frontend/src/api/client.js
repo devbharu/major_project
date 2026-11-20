@@ -1,6 +1,8 @@
 // Single place that talks to the Flask API. Components never call fetch directly.
 const TOKEN_KEY = "warren_token";
 
+export const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+
 export const tokenStore = {
   get: () => localStorage.getItem(TOKEN_KEY),
   set: (t) => localStorage.setItem(TOKEN_KEY, t),
@@ -14,7 +16,7 @@ async function request(method, path, body) {
   const headers = { "Content-Type": "application/json" };
   const token = tokenStore.get();
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(`/api${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const res = await fetch(`${API_BASE}/api${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
   const data = await res.json().catch(() => ({}));
   if (res.status === 401 && token) onUnauthorized();
   if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);

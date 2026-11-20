@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { api } from "../api/client";
+import { api, API_BASE } from "../api/client";
 
 // Subscribe to server-sent events. `topics` e.g. ["board", "pr:12"]; `onUpdate` fires (debounced) when anything changes.
 // EventSource cannot send headers, so each connection first buys a 60-second single-use ticket (the session token never goes in a URL).
@@ -16,7 +16,7 @@ export function useLive(topics, onUpdate) {
       try {
         const { ticket } = await api.streamTicket();
         if (closed) return;
-        source = new EventSource(`/api/stream?topics=${encodeURIComponent(key)}&ticket=${encodeURIComponent(ticket)}`);
+        source = new EventSource(`${API_BASE}/api/stream?topics=${encodeURIComponent(key)}&ticket=${encodeURIComponent(ticket)}`);
         source.onopen = () => { delay = 1000; };
         source.addEventListener("update", () => {
           clearTimeout(timer);

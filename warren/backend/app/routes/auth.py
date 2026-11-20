@@ -30,12 +30,13 @@ def config():
 @bp.get("/github/login")
 def github_login():
     if not settings.github_oauth_enabled:
-        return redirect(f"{settings.frontend_url}/login?error=GitHub+OAuth+is+not+configured")
+        return redirect(f"{settings.primary_frontend_url}/login?error=GitHub+OAuth+is+not+configured")
     nonce = secrets.token_urlsafe(16)
     callback = f"{settings.backend_url}/api/auth/github/callback"
     resp = make_response(redirect("https://github.com/login/oauth/authorize?" + requests.compat.urlencode({
         "client_id": settings.github_client_id, "redirect_uri": callback, "scope": "repo workflow read:user", "state": issue_state(nonce)})))
-    resp.set_cookie("warren_oauth", nonce, max_age=600, httponly=True, samesite="Lax", secure=request.is_secure)
+    is_https = request.is_secure or request.headers.get("X-Forwarded-Proto") == "https" or settings.env == "production"
+    resp.set_cookie("warren_oauth", nonce, max_age=600, httponly=True, samesite="Lax", secure=is_https)
     return resp
 
 
@@ -43,14 +44,14 @@ def github_login():
 def github_callback():
     nonce = verify_state(request.args.get("state", ""))
     if not nonce or not secrets.compare_digest(nonce, request.cookies.get("warren_oauth", "")):
-        return redirect(f"{settings.frontend_url}/login?error=Invalid+OAuth+state")
+        return redirect(f"{settings.primary_frontend_url}/login?error=Invalid+OAuth+state")
     resp = requests.post("https://github.com/login/oauth/access_token", headers={"Accept": "application/json"}, timeout=20, data={
         "client_id": settings.github_client_id, "client_secret": settings.github_client_secret, "code": request.args.get("code", "")})
     token = resp.json().get("access_token")
     if not token:
-        return redirect(f"{settings.frontend_url}/login?error=GitHub+rejected+the+login")
+        return redirect(f"{settings.primary_frontend_url}/login?error=GitHub+rejected+the+login")
     session = _login(GitHubClient(token).user(), token)
-    out = make_response(redirect(f"{settings.frontend_url}/auth/callback#token={session}"))
+    out = make_response(redirect(f"{settings.primary_frontend_url}/auth/callback#token={session}"))
     out.delete_cookie("warren_oauth")
     return out
 

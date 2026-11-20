@@ -28,8 +28,9 @@ def validate_runtime():
         problems.append("DEMO_SEED must be off")
     if settings.public_url and not settings.github_webhook_secret:
         problems.append("GITHUB_WEBHOOK_SECRET is required when PUBLIC_URL is set")
-    if not settings.frontend_url.startswith("https://"):
-        problems.append("FRONTEND_URL must be https://")
+    for u in settings.cors_origins:
+        if not u.startswith("https://"):
+            problems.append(f"FRONTEND_URL ({u}) must be https:// in production")
     if problems:
         raise RuntimeError("Unsafe production configuration: " + "; ".join(problems))
     if not settings.token_encryption_key:
@@ -45,7 +46,24 @@ def create_app() -> Flask:
     if settings.trust_proxy:
         from werkzeug.middleware.proxy_fix import ProxyFix
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
-    CORS(app, origins=[settings.frontend_url] + ([] if settings.env == "production" else ["http://127.0.0.1:5173"]))
+
+    allowed_origins = list(settings.cors_origins)
+    if settings.env != "production":
+        for local_origin in ("http://localhost:5173", "http://127.0.0.1:5173"):
+            if local_origin not in allowed_origins:
+                allowed_origins.append(local_origin)
+    # Support Vercel deployment and preview subdomains if a Vercel domain is configured
+    if any("vercel.app" in u for u in allowed_origins):
+        import re
+        allowed_origins.append(re.compile(r"^https://.*\.vercel\.app$"))
+
+    CORS(
+        app,
+        origins=allowed_origins,
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    )
 
     os.makedirs(settings.chroma_path, exist_ok=True)
     app.db = Database(settings.sqlite_path)

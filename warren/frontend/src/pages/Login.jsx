@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { api } from "../api/client";
+import { api, API_BASE } from "../api/client";
 import { Icon, Logo } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 
@@ -36,7 +36,7 @@ export default function Login() {
         <h1>Cut review time <em>and</em> bugs in half.</h1>
         <p className="muted">Warren reviews every pull request, prioritises your queue, explains the blast radius, and fixes what it finds — verified in a sandbox.</p>
 
-        <a className={`btn primary big ${config.github_oauth ? "" : "disabled"}`} href={config.github_oauth ? "/api/auth/github/login" : undefined}
+        <a className={`btn primary big ${config.github_oauth ? "" : "disabled"}`} href={config.github_oauth ? `${API_BASE}/api/auth/github/login` : undefined}
            onClick={(e) => !config.github_oauth && e.preventDefault()}>
           <Icon name="github" size={18} /> Continue with GitHub
         </a>

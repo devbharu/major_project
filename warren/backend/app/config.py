@@ -6,7 +6,12 @@ from dataclasses import dataclass, field
 
 from dotenv import load_dotenv
 
+# Search order:
+# 1. backend/.env (when running inside backend/)
+# 2. root .env (warren/.env)
+# 3. current working directory
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 load_dotenv()
 
 
@@ -78,6 +83,15 @@ class Settings:
     @property
     def sandbox_enabled(self) -> bool:
         return bool(self.e2b_api_key)
+
+    @property
+    def cors_origins(self) -> list[str]:
+        urls = [u.strip().rstrip("/") for u in self.frontend_url.split(",") if u.strip()]
+        return urls or ["http://localhost:5173"]
+
+    @property
+    def primary_frontend_url(self) -> str:
+        return self.cors_origins[0]
 
 
 settings = Settings()
